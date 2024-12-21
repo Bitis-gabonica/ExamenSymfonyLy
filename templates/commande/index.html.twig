@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2 class="mb-4">Nouvelle Commande</h2>
+
+    <!-- Recherche de client -->
+    <div class="mb-4 p-4 border rounded">
+        <h3>Rechercher un Client</h3>
+        <form method="get" action="{{ path('create.commande') }}" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="telephone" class="form-control" placeholder="Numéro de téléphone" required>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Affichage client -->
+    {% if client is defined and client %}
+        <div class="mb-4 p-4 border rounded">
+            <h3>Informations du Client</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Nom :</label>
+                    <input type="text" class="form-control" value="{{ client.nom }}" disabled>
+                </div>
+                <div class="col-md-4">
+                    <label>Téléphone :</label>
+                    <input type="text" class="form-control" value="{{ client.telephone }}" disabled>
+                </div>
+                <div class="col-md-4">
+                    <label>Adresse :</label>
+                    <input type="text" class="form-control" value="{{ client.adresse }}" disabled>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="mb-4 p-4 border rounded">
+            <h3>Nouvelle Commande</h3>
+            {{ form_start(form) }}
+
+            <!-- Date -->
+            <div class="mb-4">
+                <label for="commande_date" class="form-label">Date de la Commande</label>
+                {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <!-- Tableau des articles disponibles -->
+            <div class="mb-4">
+                <h3>Articles disponibles</h3>
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Sélectionner</th>
+                            <th scope="col">Nom de l'article</th>
+                            <th scope="col">Prix</th>
+                            <th scope="col">Quantité</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in articles %}
+                            <tr>
+                                <!-- Checkbox pour sélectionner l'article -->
+                                <td>
+                                    <input type="checkbox" name="articles[{{ article.id }}][selected]" value="1" class="form-check-input">
+                                </td>
+
+                                <!-- Nom de l'article -->
+                                <td>{{ article.nom }}</td>
+
+                                <!-- Prix de l'article -->
+                                <td>{{ article.prix | number_format(0, '.', ',') }} CFA</td>
+
+                                <!-- Champ pour la quantité -->
+                                <td>
+                                    <input type="number" name="articles[{{ article.id }}][quantite]" min="1" class="form-control" style="width: 100px;" disabled>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bouton d'envoi -->
+            <div class="d-flex justify-content-between">
+                <h4>Total : <span id="total" class="text-primary">0.0 CFA</span></h4>
+                <button  type="submit" class="btn btn-primary">Valider la Commande</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">Aucun client trouvé. Veuillez effectuer une recherche.</div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const totalElement = document.getElementById('total');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const row = this.closest('tr');
+                const quantityInput = row.querySelector('input[type="number"]');
+                const price = parseFloat(row.children[2].textContent.replace(' CFA', '').replace(',', '')) || 0;
+
+                if (this.checked) {
+                    quantityInput.disabled = false;
+                    quantityInput.addEventListener('input', function () {
+                        updateTotal();
+                    });
+                } else {
+                    quantityInput.disabled = true;
+                    quantityInput.value = '';
+                    updateTotal();
+                }
+            });
+        });
+
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const quantityInput = row.querySelector('input[type="number"]');
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const price = parseFloat(row.children[2].textContent.replace(' CFA', '').replace(',', '')) || 0;
+
+                total += quantity * price;
+            });
+            totalElement.textContent = `${total.toFixed(2)} CFA`;
+        }
+    });
+</script>
+{% endblock %}
+

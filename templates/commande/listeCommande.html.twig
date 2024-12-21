@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Liste des Commandes</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Date</th>
+                <th scope="col">Client</th>
+                <th scope="col">Montant Total</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+                <tr>
+                    <td>{{ commande.id }}</td>
+                    <td>{{ commande.date|date('d/m/Y') }}</td>
+                    <td>{{ commande.client.nom }} {{ commande.client.prenom }}</td>
+                    <td>{{ commande.total | number_format(0, '.', ',') }} CFA</td>
+                    <td>
+                        <a href="{{ path('details.commande', { id: commande.id }) }}" class="btn btn-primary btn-sm">
+                            Voir
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Aucune commande trouvée.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

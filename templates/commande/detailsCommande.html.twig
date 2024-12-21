@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<div class="container mt-5">
+    <!-- Bloc Informations -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Informations</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Informations du client -->
+                <div class="col-md-6">
+                    <h5 class="card-title">Informations du client</h5>
+                    <p><strong>Nom :</strong> {{ client.nom }} {{ client.prenom }}</p>
+                    <p><strong>Adresse :</strong> {{ client.adresse }}</p>
+                    <p><strong>Téléphone :</strong> {{ client.telephone }}</p>
+                </div>
+
+                <!-- Informations de la commande -->
+                <div class="col-md-6">
+                    <h5 class="card-title">Informations de la commande</h5>
+                    <p><strong>Date :</strong> {{ commande.date|date('Y-m-d') }}</p>
+                    <p><strong>Montant total :</strong> {{ commande.total | number_format(0, '.', ',') }} CFA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bloc des Approvisionnements -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Liste des Approvisionnements</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Article</th>
+                        <th scope="col">Prix unitaire</th>
+                        <th scope="col">Quantité</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for approvisionnement in articles %}
+                        <tr>
+                            <td>{{ approvisionnement.article.nom }}</td>
+                            <td>{{ approvisionnement.article.prix | number_format(0, '.', ',') }} CFA</td>
+                            <td>{{ approvisionnement.quantite }}</td>
+                            <td>{{ approvisionnement.total | number_format(0, '.', ',') }} CFA</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Aucun approvisionnement trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
